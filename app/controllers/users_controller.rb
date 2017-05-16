@@ -13,7 +13,6 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @microposts = @user.microposts.paginate(page: params[:page], :per_page => 30) 
     redirect_to root_url unless @user.activated?
-
   end
 
   def new
