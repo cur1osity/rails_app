@@ -1,18 +1,42 @@
 # encoding: utf-8
 
 class PictureUploader < CarrierWave::Uploader::Base
-
-  # Include RMagick or MiniMagick support:
-  # include CarrierWave::RMagick
+ # after :store, :delete_old_tmp_file
+  #Include RMagick or MiniMagick support:
+  #include CarrierWave::RMagick
   include CarrierWave::MiniMagick
+
   process resize_to_limit: [400, 400]
 
+  version :thumb do
+    process resize_to_fit: [60, 60]
+   end
+
+   version :big do
+    process resize_to_limit: [120, 120]
+  end
+
+  version :small do
+    process resize_to_limit: [20, 20]
+  end
 
 if Rails.env.production?
 storage :fog
 else
 storage :file
 end
+
+  # remember the tmp file
+  def cache!(new_file)
+    super
+    @old_tmp_file = new_file
+  end
+  
+  def delete_old_tmp_file(dummy)
+    @old_tmp_file.try :delete
+  end
+
+
 
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
